@@ -20,9 +20,9 @@ want to collect messages from.
 we recommend to use https://www.eclipse.org/paho/index.php?page=downloads.php
 client
 
-you can check the that the broker works with this code, pase it before line 250
+You can check the that the broker works with this code, pase it before line 250
+The code sends each topic in each bucket {num} messages.
 
-	// test code for checking if the program works
 	num := 5
 	for _, topics := range conf.Buckets {
 		for _, topic := range topics {
