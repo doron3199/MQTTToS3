@@ -19,6 +19,25 @@ Have a mqtt broker, write in the conf file the channels that you
 want to collect messages from.
 we recommend to use https://www.eclipse.org/paho/index.php?page=downloads.php
 client
+
+you can check the that the broker works with this code, pase it before line 250
+
+	// test code for checking if the program works
+	num := 5
+	for _, topics := range conf.Buckets {
+		for _, topic := range topics {
+			for i := 0; i < num; i++ {
+				text := fmt.Sprintf("hey %d", i)
+				token = client.Publish(topic, 0, false, text)
+				token.Wait()
+				time.Sleep(time.Second)
+			}
+		}
+	}
+
+	// before this line
+	http.Handle("/metrics", promhttp.Handler())
+
 ### S3 bucket
 The program	 was checked on AWS S3 and CEPH S3 and supposed to work with S3 protocols from any service. the only thing yu need to do is
 to create a bucket.

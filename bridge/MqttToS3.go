@@ -251,25 +251,7 @@ func main() {
 	errPrem := http.ListenAndServe(":2112", nil)
 	if errPrem != nil {
 		fmt.Println("Prometheus failed")
+		client.Disconnect(100)
 		return
 	}
-
-	// test code for checking if the program works
-	//num := 5
-	//for _, topics := range conf.Buckets {
-	//	for _, topic := range topics {
-	//		for i := 0; i < num; i++ {
-	//			text := fmt.Sprintf("hey %d", i)
-	//			token = client.Publish(topic, 0, false, text)
-	//			token.Wait()
-	//			time.Sleep(time.Second)
-	//		}
-	//	}
-	//}
-
-	for {
-		time.Sleep(1)
-	}
-
-	//client.Disconnect(100)
 }
