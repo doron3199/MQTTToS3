@@ -25,8 +25,8 @@ var SizeOfUint32InBytes = 4
 type Conf struct {
 	Broker        string              `yaml:"broker"`
 	Buckets       map[string][]string `yaml:"buckets"`
-	S3Region      string              `yaml:"S3Region"`
-	S3Endpoint    string              `yaml:"S3endPoint"`
+	S3Region      string              `yaml:"s3Region"`
+	S3Endpoint    string              `yaml:"s3Endpoint"`
 	StopCondition string              `yaml:"stopCondition"`
 	MaxSize       int                 `yaml:"maxSize"`
 }
@@ -73,7 +73,8 @@ func uploadToS3(bucket string, time int, payload []byte, headerSize int, uploade
 		Metadata: m,
 	})
 	if err != nil {
-		fmt.Printf("failed to upload file, %d\n", err)
+		fmt.Printf("failed to upload file, %v\n", err)
+		return
 	}
 	fmt.Printf("Message at time %d was uploaded to bucket %s\n ID = %s, location = %s",
 		time, bucket, result.UploadID, result.Location)
@@ -105,7 +106,7 @@ func mqttPayloadArrToS3Payload(payloadArr [][]byte, unixTimeArray []int64, topic
 	finalPayload := make([]byte, len(jsonHeader)+len(body))
 	copy(finalPayload[:headerSize], jsonHeader)
 	copy(finalPayload[headerSize:], body)
-	fmt.Printf("header size is %v \nbody size is %v\n so the file size is %v", headerSize, len(body), len(finalPayload))
+	fmt.Printf("header size is %v \nbody size is %v\nfile size is %v\n", headerSize, len(body), len(finalPayload))
 	return finalPayload, headerSize
 }
 
@@ -187,6 +188,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
+	fmt.Println(conf)
 	var stopCondition int
 	switch conf.StopCondition {
 	case "bytes":
@@ -211,11 +213,16 @@ func main() {
 	}
 
 	// s3 utils
+	forcePathStyle := true
+	disableSSL := true
 	var config aws.Config
 	if conf.S3Endpoint != "" {
 		config = aws.Config{
-			Region:   aws.String(conf.S3Region),
-			Endpoint: aws.String(conf.S3Endpoint)}
+			Region:           aws.String(conf.S3Region),
+			Endpoint:         aws.String(conf.S3Endpoint),
+			S3ForcePathStyle: &forcePathStyle,
+			DisableSSL:       &disableSSL,
+		}
 	} else {
 		config = aws.Config{
 			Region: aws.String(conf.S3Region)}
