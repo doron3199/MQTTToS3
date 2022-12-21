@@ -179,7 +179,7 @@ func main() {
 	// read config file
 	yamlFile, err := ioutil.ReadFile(yamlPath)
 	if err != nil {
-		log.Printf("yamlFile.Get err   #%v ", err)
+		log.Fatalf("yamlFile.Get err   #%v ", err)
 	}
 
 	// convert it to Conf interface
