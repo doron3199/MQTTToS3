@@ -1,0 +1,44 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: mqtts3
+spec: {}
+status: {}
+---
+apiVersion: v1
+data:
+  config: |
+    broker: tcp://test.mosquitto.org:1883
+    stopCondition: length
+    maxSize: 5
+    s3Region: default
+    s3Endpoint: localhost:8000
+    buckets:
+      mybucket:
+        - mytopic1
+        - mytopic2
+kind: ConfigMap
+metadata:
+  name: mqconfig
+  namespace: mqtts3
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mqtt-s3
+  namespace: mqtts3
+spec:
+  containers:
+  - name: mqtt-s3
+    image: quay.io/praveenkumar/mqtts3:latest
+    command: ["/opt/mqtt/MqttToS3", "/var/run/configmaps/mq-config/config"]
+    volumeMounts:
+    - name: mqtt-config
+      mountPath: /var/run/configmaps/mq-config
+  volumes:
+  - name: mqtt-config
+    configMap:
+      name: mqconfig
+      defaultMode: 420
