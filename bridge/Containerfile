@@ -1,0 +1,16 @@
+FROM registry.access.redhat.com/ubi8/go-toolset:1.17.7 as builder
+
+USER root
+WORKDIR /workspace
+COPY . .
+RUN go build -o MqttToS3 MqttToS3.go
+
+FROM registry.access.redhat.com/ubi8/ubi-minimal 
+
+LABEL MAINTAINER "Praveen Kumar <prkumar@redhat.com>"
+
+RUN mkdir /opt/mqtt
+COPY --from=builder /workspace/MqttToS3 /opt/mqtt/MqttToS3
+
+WORKDIR /opt/mqtt
+ENTRYPOINT ["./MqttToS3"]

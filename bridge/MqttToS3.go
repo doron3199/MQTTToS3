@@ -167,19 +167,39 @@ var connectionLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, 
 	fmt.Printf("Connection Lost: %s\n", err.Error())
 }
 
+func printUsage() {
+	fmt.Println(`Mqtt to S3 Converter
+Usage:
+./mqttToS3 config.yaml
+
+Sample config file:
+
+broker: tcp://test.mosquitto.org:1883
+stopCondition: length
+maxSize: 5
+s3Region: default
+s3Endpoint: localhost:8000
+buckets:
+  mybucket:
+    - mytopic1
+    - mytopic2
+`)
+}
+
 func main() {
 	var yamlPath string
 	if len(os.Args) == 2 {
 		yamlPath = os.Args[1]
 	} else {
-		fmt.Println("Using default yaml path")
-		yamlPath = "./conf.yaml"
+		printUsage()
+		os.Exit(1)
 	}
 
 	// read config file
 	yamlFile, err := ioutil.ReadFile(yamlPath)
 	if err != nil {
-		log.Printf("yamlFile.Get err   #%v ", err)
+		printUsage()
+		log.Fatalf("Failed to read %s err: %v ", yamlPath, err)
 	}
 
 	// convert it to Conf interface
