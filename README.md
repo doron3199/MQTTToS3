@@ -123,3 +123,20 @@ the array have unix time, topic name, and start offset
 you can filter the messages by those topic
 to get message N - get bytes from object from 
 offset N to offset N + 1 (or to end of file for the last one)
+
+## Deploy bridge to Kubernetes/OpenShift
+To create the container image for bridge, use the containerfile which is in the
+`bridge` directory. You can use podman/docker to create it like
+```bash
+podman build -t quay.io/<username>/mqttos3:latest -f Containerfile
+podman push quay.io/<username>/mqttos3:latest
+```
+
+To deploy it on a Kubernetes/OpenShift, use the deploytok8s.yaml file which creates
+a `mqtts3` namespace and then deploy a configmap which contains the config file and
+create a pod. Do update the `image` section in the pod resource in case you want to
+use a custome image.
+
+```base
+kubectl apply -f bridge/deploytok8s.yaml
+```
